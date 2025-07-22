@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Flor Tornasol Reactiva</title>
+    <style>
+      body { margin: 0; overflow: hidden; background: black; }
+      canvas { display: block; }
+    </style>
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script>
+      let scene, camera, renderer, group, analyser;
+      let dataArray, audioStream;
+
+      init();
+      animate();
+
+      async function init() {
+        // Escena y cámara
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        // Render
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Luces
+        const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(5, 5, 5);
+        scene.add(ambient, dirLight);
+
+        // Flor
+        group = new THREE.Group();
+        const petalCount = 10;
+
+        for (let i = 0; i < petalCount; i++) {
+          const geometry = new THREE.TorusGeometry(0.2, 0.05, 16, 100);
+          const material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(`hsl(${i * (360 / petalCount)}, 100%, 60%)`),
+            metalness: 0.9,
+            roughness: 0.1
+          });
+          const petal = new THREE.Mesh(geometry, material);
+          petal.rotation.x = Math.PI / 2;
+          petal.position.set(Math.cos((i / petalCount) * 2 * Math.PI) * 1.1, Math.sin((i / petalCount) * 2 * Math.PI) * 1.1, 0);
+          petal.lookAt(0, 0, 0);
+          group.add(petal);
+        }
+
+        scene.add(group);
+
+        // Audio
+        try {
+          audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const audioContext = new AudioContext();
+          const source = audioContext.createMediaStreamSource(audioStream);
+          analyser = audioContext.createAnalyser();
+          analyser.fftSize = 64;
+          source.connect(analyser);
+          dataArray = new Uint8Array(analyser.frequencyBinCount);
+        } catch (e) {
+          alert("Necesitas permitir acceso al micrófono para que funcione el efecto.");
+        }
+
+        // Resize
+        window.addEventListener('resize', () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        let volume = 0;
+        if (analyser) {
+          analyser.getByteFrequencyData(dataArray);
+          volume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length / 256;
+        }
+
+        // Animación de flor según volumen
+        group.rotation.y += 0.01 + volume * 0.1;
+        group.scale.setScalar(1 + volume * 0.5);
+
+        renderer.render(scene, camera);
+      }
+    </script>
+  </body>
+</html>

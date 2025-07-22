@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Flor Estrella Tornasol</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: black; }
+    canvas, audio { display: block; }
+  </style>
+</head>
+<body>
+  <audio id="audio" src="dembassuno.wav" controls></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script>
+    let scene, camera, renderer, group, analyser, dataArray;
+
+    init();
+    animate();
+
+    async function init() {
+      // Escena
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 5;
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+      dirLight.position.set(5, 5, 5);
+      scene.add(ambient, dirLight);
+
+      // Flor con estrellas
+      group = new THREE.Group();
+      const petalCount = 10;
+
+      for (let i = 0; i < petalCount; i++) {
+        const shape = createStarShape(0.2, 0.08, 5);
+        const extrudeSettings = { depth: 0.05, bevelEnabled: false };
+        const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        const material = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(`hsl(${i * (360 / petalCount)}, 100%, 60%)`),
+          metalness: 0.9,
+          roughness: 0.1
+        });
+        const star = new THREE.Mesh(geometry, material);
+        star.rotation.x = Math.PI / 2;
+        const angle = (i / petalCount) * 2 * Math.PI;
+        star.position.set(Math.cos(angle) * 1.1, Math.sin(angle) * 1.1, 0);
+        star.lookAt(0, 0, 0);
+        group.add(star);
+      }
+
+      scene.add(group);
+
+      // Audio
+      const audioElement = document.getElementById("audio");
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const track = audioContext.createMediaElementSource(audioElement);
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 128;
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
+      track.connect(analyser);
+      analyser.connect(audioContext.destination);
+
+      // Necesario en algunos navegadores
+      audioElement.addEventListener('play', () => {
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
+
+    function getAverageVolume(start, end) {
+      let sum = 0;
+      for (let i = start; i < end; i++) {
+        sum += dataArray[i] || 0;
+      }
+      return sum / (end - start) / 255;
+    }
+
+    function createStarShape(outerRadius, innerRadius, points) {
+      const shape = new THREE.Shape();
+      const step = Math.PI / points;
+
+      for (let i = 0; i < points * 2; i++) {
+        const r = i % 2 === 0 ? outerRadius : innerRadius;
+        const x = Math.cos(i * step) * r;
+        const y = Math.sin(i * step) * r;
+        if (i === 0) {
+          shape.moveTo(x, y);
+        } else {
+          shape.lineTo(x, y);
+        }
+      }
+      shape.closePath();
+      return shape;
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      let bass = 0, treble = 0;
+
+      if (analyser) {
+        analyser.getByteFrequencyData(dataArray);
+        bass = getAverageVolume(0, 10);       // graves
+        treble = getAverageVolume(40, 63);    // agudos
+      }
+
+      group.rotation.z += 0.005;
+      group.rotation.x += bass * 0.1;
+      group.rotation.y += treble * 0.1;
+      group.scale.setScalar(1 + bass * 0.4);
+
+      renderer.render(scene, camera);
+    }
+  </script>
+</body>
+</html>
