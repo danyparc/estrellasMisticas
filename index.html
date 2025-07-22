@@ -3,28 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <title>Flor Estelar Mística - Índice de Iteraciones</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       background: radial-gradient(#0a0a0a, #000000);
       color: #ffffff;
       font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
+      padding: 2em 1em;
     }
-    h1 {
-      font-size: 2.5em;
+    .left h1 {
+      font-size: 2em;
+      color: #ffffff;
       margin-bottom: 0.5em;
       text-align: center;
+    }
+    .right h2 {
+      font-size: 1.5em;
       color: #88ccff;
+      margin: 1em 0;
+      text-align: center;
+    }
+    p {
+      font-size: 1em;
+      line-height: 1.6em;
+      text-align: center;
+      color: #dddddd;
+      margin-bottom: 1.5em;
     }
     ul {
       list-style: none;
       padding: 0;
-      max-width: 400px;
+      margin: 0 auto;
       text-align: center;
     }
     li {
@@ -42,21 +57,54 @@
     a:hover {
       background: rgba(136, 204, 255, 0.3);
     }
+
+    @media (min-width: 768px) {
+      .container {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: 0 auto;
+        gap: 3em;
+      }
+      .left, .right {
+        flex: 1;
+      }
+      .left h1, .right h2 {
+        text-align: left;
+      }
+      p, ul {
+        text-align: left;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>🌌 Índice de Iteraciones</h1>
-  <ul>
-    <li><a href="uno.html">1. uno.html</a></li>
-    <li><a href="dos.html">2. dos.html</a></li>
-    <li><a href="tres.html">3. tres.html</a></li>
-    <li><a href="cuatro.html">4. cuatro.html</a></li>
-    <li><a href="star.html">5. star.html</a></li>
-    <li><a href="tresAnillos.html">6. tresAnillos.html</a></li>
-    <li><a href="blooming.html">7. blooming.html</a></li>
-    <li><a href="florEstelarMistica.html">8. florEstelarMistica.html</a></li>
-    <li><a href="estrellasMisticas.html">9. estrellasMisticas.html</a></li>
-    <li><a href="nuevasEstrellas.html">10. nuevasEstrellas.html</a></li>
-  </ul>
+  <div class="container">
+    <div class="left">
+      <h1>💫 Estrellas Místicas ✨</h1>
+      <p>
+        Esta aventura comenzó con una idea sencilla: crear una flor 3D que girara al ritmo de la música. Pero como sucede con toda creación viva, pronto evolucionó. Iteración tras iteración, esa flor se fue transformando en una constelación de estrellas danzantes, orbitando una Tierra luminosa. Pasamos de toroides tornasolados a anillos que respiran, de estructuras geométricas a formas con alma y brillo propio.
+      </p>
+      <p>
+        En total, construimos 10 versiones distintas, cada una explorando un ángulo único de esta visión cósmica: formas, texturas, tipografías, reactividad sonora y postprocesamiento visual. Aquí puedes acceder a cada una y revivir el viaje completo:
+      </p>
+    </div>
+    <div class="right">
+      <h2>🌌 Índice de Iteraciones</h2>
+      <ul>
+        <li><a href="uno.html">1. uno.html</a></li>
+        <li><a href="dos.html">2. dos.html</a></li>
+        <li><a href="tres.html">3. tres.html</a></li>
+        <li><a href="cuatro.html">4. cuatro.html</a></li>
+        <li><a href="star.html">5. star.html</a></li>
+        <li><a href="tresAnillos.html">6. tresAnillos.html</a></li>
+        <li><a href="blooming.html">7. blooming.html</a></li>
+        <li><a href="florEstelarMistica.html">8. florEstelarMistica.html</a></li>
+        <li><a href="estrellasMisticas.html">9. estrellasMisticas.html</a></li>
+        <li><a href="nuevasEstrellas.html">10. nuevasEstrellas.html</a></li>
+      </ul>
+    </div>
+  </div>
 </body>
 </html>
