@@ -56,8 +56,8 @@
           const source = audioContext.createMediaStreamSource(audioStream);
           analyser = audioContext.createAnalyser();
           analyser.fftSize = 128;
-          dataArray = new Uint8Array(analyser.frequencyBinCount);
           source.connect(analyser);
+          dataArray = new Uint8Array(analyser.frequencyBinCount);
         } catch (e) {
           alert("Activa el micrófono para experimentar esta belleza sonora bb 🌸");
         }
@@ -72,7 +72,7 @@
       function getAverageVolume(start, end) {
         let sum = 0;
         for (let i = start; i < end; i++) {
-          sum += dataArray[i];
+          sum += dataArray[i] || 0;
         }
         return sum / (end - start) / 256; // Normalize
       }
